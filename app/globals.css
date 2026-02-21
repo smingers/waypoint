@@ -1,2 +1,44 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+
+:root {
+  --background: #0C0E12;
+  --foreground: #E7EBEF;
+  --card: #151A24;
+  --muted: #1E2836;
+  --muted-foreground: #6C7C93;
+  --secondary-foreground: #9BA8B9;
+  --border: #23272F;
+  --primary: #13DAEC;
+  --primary-foreground: #0C0E12;
+  --accent: #FFA500;
+  --radius: 0.75rem;
+}
+
+/* TrueNorth grid background */
+.bg-grid {
+  background-image:
+    linear-gradient(hsl(220 15% 16% / 0.5) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(220 15% 16% / 0.5) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Radial glow from top center */
+.bg-radial-glow {
+  background: radial-gradient(ellipse 600px 400px at 50% 0%, hsl(185 85% 50% / 0.08), transparent);
+}
+
+/* Floating orb animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Primary glow effect */
+.glow-primary {
+  box-shadow: 0 0 40px -10px hsl(185 85% 50% / 0.4);
+}

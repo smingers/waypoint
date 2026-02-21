@@ -1,8 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+
+const LOADING_MESSAGES = [
+  "Reading between the lines of your PRD...",
+  "Channeling the ghost of Steve Jobs...",
+  "Questioning every assumption you hold dear...",
+  "Imagining the 10x version of this...",
+  "Interviewing fictional users in our head...",
+  "Stress-testing your success metrics...",
+  "Drafting the pre-mortem no one asked for...",
+  "Wondering if you talked to actual customers...",
+  "Looking for the hidden assumptions...",
+  "Brainstorming moonshot alternatives...",
+  "Checking if this would survive a board meeting...",
+  "Calculating the odds this ships on time...",
+  "Finding the things you forgot to write down...",
+  "Preparing opinions you didn't ask for...",
+];
 
 const EXAMPLE_PRD = `# Feature: Smart Notifications System
 
@@ -34,6 +51,37 @@ Build an ML-powered notification ranking system that:
 - 1 ML engineer
 - 1 product designer
 - 1 QA engineer`;
+
+function LoadingMessages() {
+  const [index, setIndex] = useState(() => Math.floor(Math.random() * LOADING_MESSAGES.length));
+  const [fade, setFade] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFade(false);
+      setTimeout(() => {
+        setIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
+        setFade(true);
+      }, 300);
+    }, 2800);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="mt-10 flex flex-col items-center gap-4">
+      <div
+        className="h-8 w-8 animate-spin rounded-full border-2"
+        style={{ borderColor: "var(--border)", borderTopColor: "var(--primary)" }}
+      />
+      <p
+        className="text-sm transition-opacity duration-300"
+        style={{ color: "var(--muted-foreground)", opacity: fade ? 1 : 0 }}
+      >
+        {LOADING_MESSAGES[index]}
+      </p>
+    </div>
+  );
+}
 
 export default function Home() {
   const [prd, setPrd] = useState("");
@@ -83,26 +131,61 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <header style={{ borderBottom: "1px solid rgba(35, 39, 47, 0.5)" }}>
-        <div className="mx-auto max-w-4xl px-6 py-5">
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Background layers — grid + radial glow */}
+      <div className="bg-grid fixed inset-0 z-0" />
+      <div className="bg-radial-glow fixed inset-0 z-0" />
+
+      {/* Floating decorative orbs */}
+      <div
+        className="animate-float pointer-events-none fixed top-1/4 left-8 z-0 h-64 w-64 rounded-full blur-3xl"
+        style={{ backgroundColor: "hsl(185 85% 50% / 0.05)" }}
+      />
+      <div
+        className="animate-float pointer-events-none fixed bottom-1/4 right-8 z-0 h-48 w-48 rounded-full blur-3xl"
+        style={{ backgroundColor: "hsl(38 95% 55% / 0.05)", animationDelay: "3s" }}
+      />
+
+      {/* Fixed header with backdrop blur — matches TrueNorth navbar */}
+      <header
+        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl"
+        style={{
+          backgroundColor: "hsl(220 20% 6% / 0.8)",
+          borderBottom: "1px solid hsl(220 15% 16% / 0.5)",
+        }}
+      >
+        <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-8">
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="TrueNorth logo" className="h-8 w-8 rounded-lg object-contain" />
-            <span className="font-bold text-lg" style={{ color: "#E7EBEF" }}>TrueNorth</span>
+            <span className="text-lg font-bold" style={{ color: "var(--foreground)" }}>
+              TrueNorth
+            </span>
           </div>
+          <span
+            className="text-xs font-medium tracking-widest uppercase"
+            style={{
+              color: "var(--primary)",
+              fontFamily: "var(--font-mono), monospace",
+            }}
+          >
+            PRD Analyzer
+          </span>
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-6 py-10">
+      {/* Main content — pushed below fixed header */}
+      <main className="relative z-10 mx-auto max-w-4xl px-6 pt-28 pb-16">
         {/* Input Section */}
         {!analysis && (
           <div>
             <div className="mb-8">
-              <h2 className="text-3xl font-bold mb-3" style={{ color: "#E7EBEF" }}>
+              <h2
+                className="mb-3 text-3xl font-bold tracking-tight md:text-5xl"
+                style={{ color: "var(--foreground)" }}
+              >
                 Analyze your PRD
               </h2>
-              <p style={{ color: "#6C7C93" }}>
+              <p className="text-lg" style={{ color: "var(--muted-foreground)" }}>
                 Paste your PRD, spec, or epic below. TrueNorth will surface hidden
                 assumptions, forecast impact, identify failure modes, and
                 brainstorm 10x alternatives.
@@ -114,12 +197,15 @@ export default function Home() {
                 value={prd}
                 onChange={(e) => setPrd(e.target.value)}
                 placeholder="Paste your PRD here..."
-                className="w-full h-80 px-4 py-3 text-sm leading-relaxed font-mono resize-y focus:outline-none"
+                className="w-full h-80 px-4 py-3 text-sm leading-relaxed resize-y focus:outline-none focus:ring-2 transition-colors"
                 style={{
-                  backgroundColor: "rgba(12, 14, 18, 0.8)",
-                  color: "#E7EBEF",
-                  border: "1px solid #23272F",
-                  borderRadius: "12px",
+                  backgroundColor: "var(--card)",
+                  color: "var(--foreground)",
+                  border: "1px solid var(--border)",
+                  borderRadius: "var(--radius)",
+                  fontFamily: "var(--font-mono), monospace",
+                  // @ts-expect-error CSS custom property for focus ring
+                  "--tw-ring-color": "hsl(185 85% 50% / 0.5)",
                 }}
                 disabled={loading}
               />
@@ -128,8 +214,8 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={loadExample}
-                  className="text-sm underline underline-offset-2 transition-colors"
-                  style={{ color: "#13DAEC" }}
+                  className="text-sm underline underline-offset-2 transition-colors hover:opacity-80"
+                  style={{ color: "var(--primary)" }}
                   disabled={loading}
                 >
                   Load example PRD
@@ -138,11 +224,11 @@ export default function Home() {
                 <button
                   type="submit"
                   disabled={loading || !prd.trim()}
-                  className="px-6 py-2.5 font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-6 py-2.5 font-semibold text-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed glow-primary hover:opacity-90"
                   style={{
-                    backgroundColor: "#13DAEC",
-                    color: "#0C0E12",
-                    borderRadius: "12px",
+                    backgroundColor: "var(--primary)",
+                    color: "var(--primary-foreground)",
+                    borderRadius: "var(--radius)",
                   }}
                 >
                   {loading ? "Analyzing..." : "Analyze PRD"}
@@ -151,24 +237,14 @@ export default function Home() {
             </form>
 
             {/* Loading state */}
-            {loading && (
-              <div className="mt-10 flex flex-col items-center gap-4">
-                <div
-                  className="h-8 w-8 animate-spin rounded-full border-2"
-                  style={{ borderColor: "#23272F", borderTopColor: "#13DAEC" }}
-                />
-                <p className="text-sm" style={{ color: "#6C7C93" }}>
-                  Analyzing your PRD — this typically takes 15-30 seconds...
-                </p>
-              </div>
-            )}
+            {loading && <LoadingMessages />}
 
             {/* Error state */}
             {error && (
               <div
                 className="mt-6 px-4 py-3 text-sm"
                 style={{
-                  borderRadius: "12px",
+                  borderRadius: "var(--radius)",
                   border: "1px solid rgba(239, 67, 67, 0.3)",
                   backgroundColor: "rgba(239, 67, 67, 0.1)",
                   color: "#EF4343",
@@ -183,21 +259,26 @@ export default function Home() {
         {/* Results Section */}
         {analysis && (
           <div>
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-2xl font-bold" style={{ color: "#E7EBEF" }}>Analysis Results</h2>
-                <p className="text-sm mt-1" style={{ color: "#6C7C93" }}>
+                <h2
+                  className="text-2xl font-bold tracking-tight"
+                  style={{ color: "var(--foreground)" }}
+                >
+                  Analysis Results
+                </h2>
+                <p className="text-sm mt-1" style={{ color: "var(--muted-foreground)" }}>
                   Strategic review of your PRD
                 </p>
               </div>
               <div className="flex gap-3">
                 <button
                   onClick={handleCopy}
-                  className="px-4 py-2 text-sm transition-colors"
+                  className="px-4 py-2 text-sm transition-colors hover:bg-white/5"
                   style={{
-                    border: "1px solid #23272F",
-                    borderRadius: "12px",
-                    color: "#6C7C93",
+                    border: "1px solid var(--border)",
+                    borderRadius: "var(--radius)",
+                    color: "var(--muted-foreground)",
                   }}
                 >
                   {copied ? "Copied!" : "Copy markdown"}
@@ -207,11 +288,11 @@ export default function Home() {
                     setAnalysis("");
                     setPrd("");
                   }}
-                  className="px-4 py-2 text-sm font-medium transition-colors"
+                  className="px-4 py-2 text-sm font-medium transition-all hover:opacity-90 glow-primary"
                   style={{
-                    backgroundColor: "#13DAEC",
-                    color: "#0C0E12",
-                    borderRadius: "12px",
+                    backgroundColor: "var(--primary)",
+                    color: "var(--primary-foreground)",
+                    borderRadius: "var(--radius)",
                   }}
                 >
                   Analyze another
@@ -222,9 +303,9 @@ export default function Home() {
             <article
               className="prose prose-invert prose-sm max-w-none p-8 prose-headings:text-[#E7EBEF] prose-p:text-[#9BA8B9] prose-strong:text-[#E7EBEF] prose-th:text-[#E7EBEF] prose-td:text-[#9BA8B9] prose-li:text-[#9BA8B9]"
               style={{
-                border: "1px solid #23272F",
-                borderRadius: "12px",
-                backgroundColor: "rgba(12, 14, 18, 0.8)",
+                border: "1px solid var(--border)",
+                borderRadius: "var(--radius)",
+                backgroundColor: "var(--card)",
               }}
             >
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{analysis}</ReactMarkdown>

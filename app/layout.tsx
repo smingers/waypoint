@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
   title: "TrueNorth — PRD Analyzer",
@@ -20,7 +21,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased`} style={{ backgroundColor: "#0C0E12", color: "#E7EBEF" }}>
+      <body
+        className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}
+        style={{
+          backgroundColor: "var(--background)",
+          color: "var(--foreground)",
+          fontFamily: "var(--font-inter), system-ui, sans-serif",
+        }}
+      >
         {children}
       </body>
     </html>
