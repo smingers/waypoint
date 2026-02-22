@@ -336,8 +336,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Stats bar */}
-            {meta && (
+            {/* Stats bar — dev only */}
+            {meta && process.env.NODE_ENV === "development" && (
               <div
                 className="mb-6 flex flex-wrap gap-x-6 gap-y-1 px-4 py-3 text-xs font-mono"
                 style={{
