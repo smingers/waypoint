@@ -11,7 +11,6 @@ import {
   SearchIcon,
   BellIcon,
   ShieldIcon,
-  ChevronDownIcon,
 } from "@/lib/demo/icons";
 
 const NAV_ITEMS = [
@@ -26,7 +25,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/demo/profiles": "Customer Profiles",
   "/demo/assessments": "PRD Assessment",
   "/demo/performance": "Feature Performance",
-  "/demo/settings": "Settings",
+  "/demo/settings": "Integrations",
 };
 
 export default function DemoLayout({ children }: { children: React.ReactNode }) {
@@ -57,7 +56,7 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
         }}
       >
         {/* Logo */}
-        <div style={{ padding: "20px 20px 8px" }}>
+        <div style={{ padding: "20px 20px 16px" }}>
           <Link
             href="/demo/insights"
             style={{
@@ -68,47 +67,15 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
               color: "var(--foreground)",
             }}
           >
-            <div
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: 6,
-                background: "linear-gradient(135deg, #13DAEC, #0BA5B5)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 14,
-                fontWeight: 700,
-                color: "#0C0E12",
-              }}
-            >
-              TN
-            </div>
+            <img
+              src="/logo.png"
+              alt="TrueNorth"
+              style={{ width: 28, height: 28, borderRadius: 6 }}
+            />
             <span style={{ fontSize: 15, fontWeight: 600, letterSpacing: "-0.01em" }}>
               TrueNorth
             </span>
           </Link>
-        </div>
-
-        {/* Company switcher */}
-        <div style={{ padding: "12px 16px 16px" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "8px 10px",
-              borderRadius: 8,
-              backgroundColor: "var(--muted)",
-              cursor: "default",
-            }}
-          >
-            <div style={{ color: "#13DAEC" }}>
-              <ShieldIcon size={14} />
-            </div>
-            <span style={{ fontSize: 13, fontWeight: 500, flex: 1 }}>Paladin</span>
-            <ChevronDownIcon size={12} />
-          </div>
         </div>
 
         {/* Nav */}
@@ -120,6 +87,7 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
               <Link
                 key={item.href}
                 href={item.href}
+                className={`demo-nav-item${isActive ? " demo-nav-active" : ""}`}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -131,8 +99,6 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
                   fontSize: 14,
                   fontWeight: isActive ? 500 : 400,
                   color: isActive ? "var(--foreground)" : "var(--muted-foreground)",
-                  backgroundColor: isActive ? "var(--muted)" : "transparent",
-                  borderLeft: isActive ? "3px solid var(--primary)" : "3px solid transparent",
                   transition: "all 0.15s ease",
                 }}
               >
@@ -145,8 +111,30 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
 
         {/* Sidebar footer */}
         <div style={{ padding: "12px 8px 16px", borderTop: "1px solid var(--border)" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "8px 10px",
+              marginBottom: 8,
+              marginLeft: 4,
+              marginRight: 4,
+              borderRadius: 8,
+              backgroundColor: "hsl(185 40% 14%)",
+              border: "1px solid hsl(185 40% 20%)",
+              color: "var(--secondary-foreground)",
+              cursor: "default",
+            }}
+          >
+            <div style={{ color: "#13DAEC" }}>
+              <ShieldIcon size={14} />
+            </div>
+            <span style={{ fontSize: 13, fontWeight: 500 }}>Paladin</span>
+          </div>
           <Link
             href="/demo/settings"
+            className={`demo-nav-item${pathname === "/demo/settings" ? " demo-nav-active" : ""}`}
             style={{
               display: "flex",
               alignItems: "center",
@@ -157,34 +145,12 @@ export default function DemoLayout({ children }: { children: React.ReactNode }) 
               fontSize: 14,
               fontWeight: pathname === "/demo/settings" ? 500 : 400,
               color: pathname === "/demo/settings" ? "var(--foreground)" : "var(--muted-foreground)",
-              backgroundColor: pathname === "/demo/settings" ? "var(--muted)" : "transparent",
-              borderLeft: pathname === "/demo/settings" ? "3px solid var(--primary)" : "3px solid transparent",
               transition: "all 0.15s ease",
             }}
           >
             <SettingsIcon size={18} />
-            Settings
+            Integrations
           </Link>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "8px 15px",
-              fontSize: 12,
-              color: "var(--muted-foreground)",
-            }}
-          >
-            <div
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                backgroundColor: "#22C55E",
-              }}
-            />
-            7 integrations connected
-          </div>
         </div>
       </aside>
 

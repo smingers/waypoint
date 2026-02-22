@@ -92,7 +92,7 @@ export default function InsightsPage() {
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
         <p style={{ fontSize: 14, color: "var(--muted-foreground)", margin: 0 }}>
-          Scanning PostHog, Intercom, HubSpot, Notion, and Slack
+          TrueNorth proactively scans all connected apps to surface issues in your product and propose feature enhancements
         </p>
       </div>
 

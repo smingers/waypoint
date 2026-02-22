@@ -52,3 +52,11 @@
 .glow-primary {
   box-shadow: 0 0 40px -10px hsl(185 85% 50% / 0.4);
 }
+
+/* Demo sidebar nav */
+.demo-nav-active {
+  background-color: var(--muted);
+}
+.demo-nav-item:not(.demo-nav-active):hover {
+  background-color: hsl(220 20% 14% / 0.6);
+}
