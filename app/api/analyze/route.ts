@@ -3,8 +3,21 @@ import { SYSTEM_PROMPT, buildAnalysisPrompt } from "@/lib/prompt";
 
 const anthropic = new Anthropic();
 
+// Cost per million tokens by model
+const PRICING: Record<string, { input: number; output: number }> = {
+  "claude-haiku-4-5-20251001": { input: 0.80, output: 4.00 },
+  "claude-sonnet-4-6": { input: 3.00, output: 15.00 },
+  "claude-opus-4-6": { input: 15.00, output: 75.00 },
+};
+
+function calcCost(model: string, inputTokens: number, outputTokens: number): number {
+  const pricing = PRICING[model] || PRICING["claude-sonnet-4-6"];
+  return (inputTokens * pricing.input + outputTokens * pricing.output) / 1_000_000;
+}
+
 export async function POST(request: Request) {
   try {
+    const startTime = Date.now();
     const { prd } = await request.json();
 
     if (!prd || typeof prd !== "string" || prd.trim().length === 0) {
@@ -23,8 +36,8 @@ export async function POST(request: Request) {
 
     const MODELS: Record<string, string> = {
       haiku: "claude-haiku-4-5-20251001",
-      sonnet: "claude-sonnet-4-6-20250514",
-      opus: "claude-opus-4-6-20250514",
+      sonnet: "claude-sonnet-4-6",
+      opus: "claude-opus-4-6",
     };
     const modelKey = process.env.ANALYSIS_MODEL || "sonnet";
     const model = MODELS[modelKey] || MODELS.sonnet;
@@ -41,7 +54,10 @@ export async function POST(request: Request) {
       ],
     });
 
-    console.log(`Analysis complete: model=${model}, stop_reason=${message.stop_reason}, tokens=${message.usage.output_tokens}`);
+    const timeSec = parseFloat(((Date.now() - startTime) / 1000).toFixed(1));
+    const cost = calcCost(model, message.usage.input_tokens, message.usage.output_tokens);
+
+    console.log(`Analysis complete: model=${model}, stop_reason=${message.stop_reason}, in=${message.usage.input_tokens}, out=${message.usage.output_tokens}, time=${timeSec}s, cost=$${cost.toFixed(4)}`);
 
     const content = message.content[0];
     if (content.type !== "text") {
@@ -56,7 +72,17 @@ export async function POST(request: Request) {
       analysis += "\n\n---\n\n*⚠️ Analysis was truncated due to length. Try a shorter PRD or a more concise analysis model.*";
     }
 
-    return Response.json({ analysis, truncated: message.stop_reason === "max_tokens" });
+    return Response.json({
+      analysis,
+      truncated: message.stop_reason === "max_tokens",
+      meta: {
+        model: modelKey,
+        inputTokens: message.usage.input_tokens,
+        outputTokens: message.usage.output_tokens,
+        timeSec,
+        cost,
+      },
+    });
   } catch (error: unknown) {
     console.error("Analysis error:", error);
 

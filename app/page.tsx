@@ -63,7 +63,7 @@ function LoadingMessages() {
         setIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
         setFade(true);
       }, 300);
-    }, 2800);
+    }, 3800);
     return () => clearInterval(interval);
   }, []);
 
@@ -89,6 +89,13 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [meta, setMeta] = useState<{
+    model: string;
+    inputTokens: number;
+    outputTokens: number;
+    timeSec: number;
+    cost: number;
+  } | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -97,6 +104,7 @@ export default function Home() {
     setLoading(true);
     setError("");
     setAnalysis("");
+    setMeta(null);
 
     try {
       const res = await fetch("/api/analyze", {
@@ -113,6 +121,9 @@ export default function Home() {
       }
 
       setAnalysis(data.analysis);
+      if (data.meta) {
+        setMeta(data.meta);
+      }
     } catch {
       setError("Failed to connect. Please try again.");
     } finally {
@@ -286,6 +297,7 @@ export default function Home() {
                 <button
                   onClick={() => {
                     setAnalysis("");
+                    setMeta(null);
                     setPrd("");
                   }}
                   className="px-4 py-2 text-sm font-medium transition-all hover:opacity-90 glow-primary"
@@ -299,6 +311,23 @@ export default function Home() {
                 </button>
               </div>
             </div>
+
+            {/* Stats bar */}
+            {meta && (
+              <div
+                className="mb-6 flex flex-wrap gap-x-6 gap-y-1 px-4 py-3 text-xs font-mono"
+                style={{
+                  backgroundColor: "hsl(220 15% 12%)",
+                  border: "1px solid var(--border)",
+                  borderRadius: "var(--radius)",
+                  color: "var(--muted-foreground)",
+                }}
+              >
+                <span>model: <span style={{ color: "var(--primary)" }}>{meta.model}</span></span>
+                <span>{meta.timeSec}s · {meta.outputTokens} tokens</span>
+                <span>cost: <span style={{ color: "var(--primary)" }}>${meta.cost.toFixed(4)}</span></span>
+              </div>
+            )}
 
             <article
               className="prose prose-invert prose-sm max-w-none p-8 prose-headings:text-[#E7EBEF] prose-p:text-[#9BA8B9] prose-strong:text-[#E7EBEF] prose-th:text-[#E7EBEF] prose-td:text-[#9BA8B9] prose-li:text-[#9BA8B9]"
