@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 
     const message = await anthropic.messages.create({
       model,
-      max_tokens: 8192,
+      max_tokens: 16384,
       system: SYSTEM_PROMPT,
       messages: [
         {
@@ -41,6 +41,8 @@ export async function POST(request: Request) {
       ],
     });
 
+    console.log(`Analysis complete: model=${model}, stop_reason=${message.stop_reason}, tokens=${message.usage.output_tokens}`);
+
     const content = message.content[0];
     if (content.type !== "text") {
       return Response.json(
@@ -49,7 +51,12 @@ export async function POST(request: Request) {
       );
     }
 
-    return Response.json({ analysis: content.text });
+    let analysis = content.text;
+    if (message.stop_reason === "max_tokens") {
+      analysis += "\n\n---\n\n*⚠️ Analysis was truncated due to length. Try a shorter PRD or a more concise analysis model.*";
+    }
+
+    return Response.json({ analysis, truncated: message.stop_reason === "max_tokens" });
   } catch (error: unknown) {
     console.error("Analysis error:", error);
 
