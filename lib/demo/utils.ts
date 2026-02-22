@@ -17,8 +17,8 @@ export function severityColor(severity: "critical" | "warning" | "info"): string
 
 export function statusLabel(status: string): { label: string; color: string } {
   switch (status) {
-    case "approved": return { label: "Approved", color: "#22C55E" };
-    case "under_review": return { label: "Under Review", color: "#F59E0B" };
+    case "approved": return { label: "Recommended", color: "#22C55E" };
+    case "under_review": return { label: "Changes Recommended", color: "#F59E0B" };
     case "needs_revision": return { label: "Needs Revision", color: "#EF4444" };
     case "exceeding": return { label: "Exceeding", color: "#22C55E" };
     case "on_track": return { label: "On Track", color: "#13DAEC" };
