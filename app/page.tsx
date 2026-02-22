@@ -4,21 +4,21 @@ import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-const LOADING_MESSAGES = [
-  "Reading between the lines of your PRD...",
-  "Channeling the ghost of Steve Jobs...",
-  "Questioning every assumption you hold dear...",
-  "Imagining the 10x version of this...",
-  "Interviewing fictional users in our head...",
-  "Stress-testing your success metrics...",
-  "Drafting the pre-mortem no one asked for...",
-  "Wondering if you talked to actual customers...",
-  "Looking for the hidden assumptions...",
-  "Brainstorming moonshot alternatives...",
-  "Checking if this would survive a board meeting...",
-  "Calculating the odds this ships on time...",
-  "Finding the things you forgot to write down...",
-  "Preparing opinions you didn't ask for...",
+const LOADING_MESSAGES: [string, string][] = [
+  ["\u{1F50D}", "Reading between the lines of your PRD..."],
+  ["\u{1F47B}", "Channeling the ghost of Steve Jobs..."],
+  ["\u{1F914}", "Questioning every assumption you hold dear..."],
+  ["\u{1F680}", "Imagining the 10x version of this..."],
+  ["\u{1F3A4}", "Interviewing fictional users in our head..."],
+  ["\u{1F4CA}", "Stress-testing your success metrics..."],
+  ["\u{26B0}\uFE0F", "Drafting the pre-mortem no one asked for..."],
+  ["\u{1F9D0}", "Wondering if you talked to actual customers..."],
+  ["\u{1F575}\uFE0F", "Looking for the hidden assumptions..."],
+  ["\u{1F31F}", "Brainstorming moonshot alternatives..."],
+  ["\u{1F454}", "Checking if this would survive a board meeting..."],
+  ["\u{1F3B2}", "Calculating the odds this ships on time..."],
+  ["\u{1F4DD}", "Finding the things you forgot to write down..."],
+  ["\u{1F624}", "Preparing opinions you didn't ask for..."],
 ];
 
 const EXAMPLE_PRD = `# Feature: Smart Notifications System
@@ -52,33 +52,57 @@ Build an ML-powered notification ranking system that:
 - 1 product designer
 - 1 QA engineer`;
 
-function LoadingMessages() {
-  const [index, setIndex] = useState(() => Math.floor(Math.random() * LOADING_MESSAGES.length));
+function LoadingOverlay() {
+  const [index, setIndex] = useState(0);
   const [fade, setFade] = useState(true);
 
   useEffect(() => {
+    // Randomize starting index on mount (client-only to avoid hydration mismatch)
+    setIndex(Math.floor(Math.random() * LOADING_MESSAGES.length));
+
     const interval = setInterval(() => {
       setFade(false);
       setTimeout(() => {
         setIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
         setFade(true);
-      }, 300);
-    }, 3800);
+      }, 400);
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="mt-10 flex flex-col items-center gap-4">
-      <div
-        className="h-8 w-8 animate-spin rounded-full border-2"
-        style={{ borderColor: "var(--border)", borderTopColor: "var(--primary)" }}
-      />
-      <p
-        className="text-sm transition-opacity duration-300"
-        style={{ color: "var(--muted-foreground)", opacity: fade ? 1 : 0 }}
-      >
-        {LOADING_MESSAGES[index]}
-      </p>
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center"
+      style={{ backgroundColor: "hsl(220 20% 6% / 0.85)" }}
+    >
+      <div className="flex flex-col items-center gap-8">
+        <p
+          className="text-4xl font-bold transition-opacity duration-300 text-center px-5 py-2 rounded-xl"
+          style={{
+            color: "var(--primary)",
+            opacity: fade ? 1 : 0,
+            backgroundColor: "var(--background)",
+          }}
+        >
+          {LOADING_MESSAGES[index][1].split(" ")[0]}
+        </p>
+        <span
+          className="transition-opacity duration-300 select-none animate-spin-slow"
+          style={{ opacity: fade ? 1 : 0, fontSize: "6.5rem", lineHeight: 1 }}
+        >
+          {LOADING_MESSAGES[index][0]}
+        </span>
+        <p
+          className="text-2xl font-bold transition-opacity duration-300 text-center px-5 py-2 rounded-xl max-w-[280px]"
+          style={{
+            color: "var(--muted-foreground)",
+            opacity: fade ? 1 : 0,
+            backgroundColor: "var(--background)",
+          }}
+        >
+          {LOADING_MESSAGES[index][1].split(" ").slice(1).join(" ")}
+        </p>
+      </div>
     </div>
   );
 }
@@ -143,6 +167,9 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
+      {/* Full-screen loading overlay */}
+      {loading && <LoadingOverlay />}
+
       {/* Background layers — grid + radial glow */}
       <div className="bg-grid fixed inset-0 z-0" />
       <div className="bg-radial-glow fixed inset-0 z-0" />
@@ -246,9 +273,6 @@ export default function Home() {
                 </button>
               </div>
             </form>
-
-            {/* Loading state */}
-            {loading && <LoadingMessages />}
 
             {/* Error state */}
             {error && (
