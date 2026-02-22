@@ -69,7 +69,7 @@ These should challenge how the team thinks about the problem space, not just sug
 ### 7. PRE-MORTEM
 Forget the PRD's targets for a moment. Based on what you've read, what's actually likely to happen?
 
-**Most likely satisficing outcome:** 1-2 sentences — what actually happens in the median case, honestly.
+**Most likely outcome:** 1-2 sentences — what actually happens in the median case, honestly, without invented numbers.
 
 **If it works (12 months out):** What were the 2-3 things that made it succeed? Focus on the mechanisms, not the metrics.
 
