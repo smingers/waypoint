@@ -1,43 +1,8 @@
 "use client";
 
-import { INSIGHTS, INSIGHT_STATS } from "@/lib/demo/data";
+import { INSIGHTS } from "@/lib/demo/data";
 import { formatDate, severityColor, toolColor } from "@/lib/demo/utils";
 import { LightbulbIcon } from "@/lib/demo/icons";
-
-function StatCard({
-  label,
-  value,
-  valueColor,
-  sub,
-}: {
-  label: string;
-  value: string | number;
-  valueColor?: string;
-  sub?: string;
-}) {
-  return (
-    <div
-      style={{
-        backgroundColor: "var(--card)",
-        border: "1px solid var(--border)",
-        borderRadius: "var(--radius)",
-        padding: "20px",
-        flex: 1,
-        minWidth: 0,
-      }}
-    >
-      <div style={{ fontSize: 12, color: "var(--muted-foreground)", marginBottom: 8, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-        {label}
-      </div>
-      <div style={{ fontSize: 28, fontWeight: 700, color: valueColor || "var(--foreground)", lineHeight: 1 }}>
-        {value}
-      </div>
-      {sub && (
-        <div style={{ fontSize: 12, color: "var(--muted-foreground)", marginTop: 4 }}>{sub}</div>
-      )}
-    </div>
-  );
-}
 
 function SourcePill({ tool }: { tool: string }) {
   const color = toolColor(tool);
@@ -94,14 +59,6 @@ export default function InsightsPage() {
         <p style={{ fontSize: 14, color: "var(--muted-foreground)", margin: 0 }}>
           TrueNorth proactively scans all connected apps to surface issues in your product and propose feature enhancements
         </p>
-      </div>
-
-      {/* Stat cards */}
-      <div style={{ display: "flex", gap: 16, marginBottom: 32 }}>
-        <StatCard label="Active Insights" value={INSIGHT_STATS.totalInsights} valueColor="var(--primary)" />
-        <StatCard label="Critical" value={INSIGHT_STATS.criticalCount} valueColor="#EF4444" />
-        <StatCard label="Avg. Resolution" value={`${INSIGHT_STATS.avgResolutionDays}d`} sub="days to resolve" />
-        <StatCard label="Data Sources" value={INSIGHT_STATS.dataSourcesActive} valueColor="#22C55E" sub="all connected" />
       </div>
 
       {/* Section header */}

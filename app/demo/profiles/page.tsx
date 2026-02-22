@@ -22,7 +22,7 @@ export default function ProfilesPage() {
     <div>
       <div style={{ marginBottom: 24 }}>
         <p style={{ fontSize: 14, color: "var(--muted-foreground)", margin: 0 }}>
-          AI-generated from PostHog, Intercom, HubSpot, and Notion data
+          Verified user personas + their top product needs - generated from your data from PostHog, Intercom, HubSpot, and Notion
         </p>
       </div>
 

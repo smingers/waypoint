@@ -15,7 +15,7 @@ export default function PerformancePage() {
     <div>
       <div style={{ marginBottom: 24 }}>
         <p style={{ fontSize: 14, color: "var(--muted-foreground)", margin: 0 }}>
-          Shipped features tracked across Linear, GitHub, and PostHog
+          Automated performance monitoring of recent features, tracked across Linear, GitHub, and PostHog
         </p>
       </div>
 
