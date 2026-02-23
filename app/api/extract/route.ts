@@ -27,21 +27,17 @@ export async function POST(request: Request) {
       );
     }
 
-    const fileType = ALLOWED_TYPES[file.type];
+    const fileExt = file.name.split(".").pop()?.toLowerCase();
+    const ext = ALLOWED_TYPES[file.type] || fileExt;
 
-    // Also check by extension as a fallback (some browsers report wrong MIME)
-    if (!fileType) {
-      const ext = file.name.split(".").pop()?.toLowerCase();
-      if (ext !== "pdf" && ext !== "docx") {
-        return Response.json(
-          { error: "Unsupported file type. Please upload a PDF or .docx file." },
-          { status: 400 }
-        );
-      }
+    if (ext !== "pdf" && ext !== "docx") {
+      return Response.json(
+        { error: "Unsupported file type. Please upload a PDF or .docx file." },
+        { status: 400 }
+      );
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const ext = fileType || file.name.split(".").pop()?.toLowerCase();
     let text = "";
 
     if (ext === "pdf") {

@@ -132,6 +132,11 @@ export default function Home() {
       return;
     }
 
+    if (file.size > 10 * 1024 * 1024) {
+      setError("File is too large. Maximum size is 10 MB.");
+      return;
+    }
+
     setUploading(true);
     setError("");
     setUploadedFileName("");
@@ -176,7 +181,9 @@ export default function Home() {
 
   function handleDragLeave(e: React.DragEvent) {
     e.preventDefault();
-    setDragOver(false);
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setDragOver(false);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -294,13 +301,13 @@ export default function Home() {
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
-                onClick={() => !uploading && fileInputRef.current?.click()}
+                onClick={() => !uploading && !loading && fileInputRef.current?.click()}
                 className="mb-3 flex items-center justify-center gap-3 px-4 py-4 cursor-pointer transition-all"
                 style={{
                   border: `2px dashed ${dragOver ? "var(--primary)" : "var(--border)"}`,
                   borderRadius: "var(--radius)",
                   backgroundColor: dragOver ? "hsl(185 85% 50% / 0.05)" : "transparent",
-                  opacity: uploading ? 0.6 : 1,
+                  opacity: (uploading || loading) ? 0.6 : 1,
                 }}
               >
                 <input
