@@ -216,17 +216,17 @@ export default function Home() {
         {/* Input Section */}
         {!analysis && (
           <div>
-            <div className="mb-8">
+            <div className="mb-4">
               <h2
                 className="mb-3 text-3xl font-bold tracking-tight md:text-5xl"
                 style={{ color: "var(--foreground)" }}
               >
-                Analyze your PRD
+                Validate your Product Concept
               </h2>
               <p className="text-lg" style={{ color: "var(--muted-foreground)" }}>
-                Paste your PRD, spec, or epic below. TrueNorth will surface hidden
-                assumptions, forecast impact, identify failure modes, and
-                brainstorm 10x alternatives.
+                Find the hidden risks and assumptions that will kill your
+                product <em>before</em> you launch — with specific actions to
+                fix them this week.
               </p>
             </div>
 
@@ -234,7 +234,7 @@ export default function Home() {
               <textarea
                 value={prd}
                 onChange={(e) => setPrd(e.target.value)}
-                placeholder="Paste your PRD here..."
+                placeholder="Paste your PRD / spec / brief / strategy document / whatever here..."
                 className="w-full h-80 px-4 py-3 text-sm leading-relaxed resize-y focus:outline-none focus:ring-2 transition-colors"
                 style={{
                   backgroundColor: "var(--card)",
@@ -248,7 +248,11 @@ export default function Home() {
                 disabled={loading}
               />
 
-              <div className="mt-4 flex items-center justify-between">
+              <p className="mt-2 text-xs text-center" style={{ color: "var(--muted-foreground)", opacity: 0.6 }}>
+                Your document is analyzed in real time and never stored.
+              </p>
+
+              <div className="mt-3 flex items-center justify-between">
                 <button
                   type="button"
                   onClick={loadExample}
