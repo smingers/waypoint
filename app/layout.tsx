@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "TrueNorth — PRD Analyzer",
+  title: "TrueNorth: Build What Matters",
   description:
     "AI-powered analysis of your PRDs. Surface hidden assumptions, forecast impact, and discover 10x alternatives.",
   icons: {
