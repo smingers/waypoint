@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -113,6 +113,10 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState("");
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [meta, setMeta] = useState<{
     model: string;
     inputTokens: number;
@@ -120,6 +124,67 @@ export default function Home() {
     timeSec: number;
     cost: number;
   } | null>(null);
+
+  const handleFileUpload = useCallback(async (file: File) => {
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    if (ext !== "pdf" && ext !== "docx") {
+      setError("Please upload a PDF or .docx file.");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setError("File is too large. Maximum size is 10 MB.");
+      return;
+    }
+
+    setUploading(true);
+    setError("");
+    setUploadedFileName("");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/extract", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to extract text from file.");
+        return;
+      }
+
+      setPrd(data.text);
+      setUploadedFileName(data.filename);
+    } catch {
+      setError("Failed to process file. Please try pasting the text instead.");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }, []);
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFileUpload(file);
+  }
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+    setDragOver(true);
+  }
+
+  function handleDragLeave(e: React.DragEvent) {
+    e.preventDefault();
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setDragOver(false);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -231,6 +296,43 @@ export default function Home() {
             </div>
 
             <form onSubmit={handleSubmit}>
+              {/* File upload drop zone */}
+              <div
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onClick={() => !uploading && !loading && fileInputRef.current?.click()}
+                className="mb-3 flex items-center justify-center gap-3 px-4 py-4 cursor-pointer transition-all"
+                style={{
+                  border: `2px dashed ${dragOver ? "var(--primary)" : "var(--border)"}`,
+                  borderRadius: "var(--radius)",
+                  backgroundColor: dragOver ? "hsl(185 85% 50% / 0.05)" : "transparent",
+                  opacity: (uploading || loading) ? 0.6 : 1,
+                }}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleFileUpload(file);
+                  }}
+                  disabled={uploading || loading}
+                />
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}>
+                  <path d="M10 3v10m0-10L6 7m4-4l4 4M3 14l.9 2.7A1 1 0 005 17.5h10a1 1 0 001-.8L17 14" stroke="var(--muted-foreground)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span className="text-sm" style={{ color: "var(--muted-foreground)" }}>
+                  {uploading
+                    ? "Extracting text..."
+                    : uploadedFileName
+                      ? <>Loaded <span style={{ color: "var(--primary)" }}>{uploadedFileName}</span> — drop another to replace</>
+                      : "Drag & drop a PDF or .docx, or click to upload"}
+                </span>
+              </div>
+
               <textarea
                 value={prd}
                 onChange={(e) => setPrd(e.target.value)}
